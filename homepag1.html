@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Submit Your Assignments</title>
+  <style>
+    /* Reset & Base */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;         
+    }
+    body {
+      display: flex;        /* Turn the body into a flex container */
+      flex-direction: column;
+      font-family: sans-serif;
+      background-color: #f8f9fa;
+    }
+
+    .container {
+      flex: 1 0 auto;       /* Let this container expand, pushing footer to bottom */
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 2rem 15px;
+    }
+
+    /* Heading row layout */
+    .heading-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    .heading-row h1 {
+      font-size: 2rem;
+      font-weight: 600;
+    }
+    .icon-right {
+      width: 150px; /* adjust as needed */
+      height: auto;
+    }
+
+    /* Card styling */
+    .card {
+      background: #fff;
+      border: 1px solid #dee2e6;
+      border-radius: 0.25rem;
+      margin-bottom: 1.5rem; /* spacing under card */
+      overflow: hidden;
+    }
+    .card-header {
+      background-color: #f8f9fa;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #dee2e6;
+      font-weight: 500;
+    }
+    .card-body {
+      padding: 1rem;
+    }
+    .card-text {
+      margin-bottom: 1rem;
+    }
+
+    /* Button styling (Bootstrap-like) */
+    .btn {
+      display: inline-block;
+      font-size: 1rem;
+      font-weight: 400;
+      line-height: 1.5;
+      border: 1px solid transparent;
+      padding: 0.5rem 1rem;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+      border-radius: 0.25rem;
+      transition: background-color 0.15s, border-color 0.15s;
+    }
+    .btn-primary {
+      color: #fff;
+      background-color: #0d6efd;
+      border-color: #0d6efd;
+      margin-right: 0.5rem;
+    }
+    .btn-primary:hover {
+      background-color: #0b5ed7;
+    }
+    .btn-secondary {
+      color: #fff;
+      background-color: #6c757d;
+      border-color: #6c757d;
+    }
+    .btn-secondary:hover {
+      background-color: #5c636a;
+    }
+
+    /* Sticky footer */
+    footer {
+      flex-shrink: 0;       /* Don’t let the footer shrink or float up */
+      text-align: center;
+      background-color: #f8f9fa;
+      border-top: 1px solid #dee2e6;
+      padding: 1rem;
+    }
+    footer p {
+      color: #6c757d;
+      font-size: 0.9rem;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Main container grows to fill the viewport, pushing footer down -->
+  <div class="container">
+    <div class="heading-row">
+      <h1>Submit your assignments</h1>
+      <img 
+        src="mainicon.webp"
+        alt="Your Icon"
+        class="icon-right"
+      >
+    </div>
+
+    <div class="card">
+      <div class="card-header">Course I</div>
+      <div class="card-body">
+        <p class="card-text">
+          You can currently submit your results to <strong>Assignment X</strong>. 
+          So far, we received X submissions.
+        </p>
+        <button type="button" class="btn btn-primary" onclick="goToSSO()">
+          Submit
+        </button>
+        <button type="button" class="btn btn-secondary">
+          Previous Submissions
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer pinned to the bottom -->
+  <footer>
+    <p> &copy; Boyue Zhou, Samer Luben Mahamid, Bella Yasir Husain Abu-Shumer, Ines ben salah, Adam Ben Rejeb</p>
+  </footer>
+
+  <script>
+    function goToSSO() {
+      // to be solved: SSO link is dynamic, call a server route that fetches the real link.
+	  // problem hier: Client (Browser)  ->  YourApp (Backend)  ->  Identity Provider (SSO)
+      window.location.href = "/auth/sso-init";
+    }
+  </script>
+</body>
+</html>
