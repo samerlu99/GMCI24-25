@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #74ebd5, #acb6e5);
+        }
+
+        .login-container {
+            background: #fff;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-container h2 {
+            margin: 0 0 20px;
+            font-size: 24px;
+            color: #333;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .form-group input:focus {
+            border-color: #74ebd5;
+            outline: none;
+        }
+
+        .button {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #74ebd5;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .button:hover {
+            background-color: #66d3c7;
+        }
+
+        .reset-password {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .reset-password a {
+            color: #74ebd5;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .reset-password a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Login</h2>
+        
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required class="email">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit" class="button" onclick = "getData()">Login</button>
+        
+        <div class="reset-password">
+            <a href="#">Forgot Password?</a>
+        </div>
+    </div>
+</body>
+<script>
+    function getData(){
+        let url = "http://127.0.0.1:5984/gmci/_design/login/_view/login?include_docs=false"; //here please put in your own endpoint for the couchdb view or make one with the exact same name as me
+        let username = "admin"; //Here please put your own COUCHDB username and passwords in the variables
+        let password = "admin";
+        fetch(url,{
+            method:'GET',
+            headers: {
+                 'Authorization': `Basic ${btoa(username + ':' + password)}`,
+                 'Accept': 'application/json',
+                 'Content-Type': 'application/json'
+            }
+        }).then(response =>response.json()).then( data =>{
+            console.log(data.rows[0].value.email);
+            console.log(data.rows[0].value.password);
+            let email = data.rows[0].value.email;
+            let role = data.rows[0].value.role;
+            console.log(role);
+            let password = data.rows[0].value.password;
+            let inputEmail = document.getElementById('email').value;
+            let inputPassword =  document.getElementById('password').value;
+            console.log(inputEmail + " and " + inputPassword);
+            if(email === inputEmail && inputPassword === password && role === "student"){
+                window.location.href = 'homepag1.html';
+                return;
+            }
+            else if(email === inputEmail && inputPassword === password && role === "tutor"){
+                window.location.href = 'homepage2.html';
+                return;
+            }
+            else{
+                alert("Password or E-mail incorrect, please correct them.")
+            }
+        })
+    }
+</script>
+</html>
