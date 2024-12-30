@@ -3,7 +3,41 @@
 <head>
   <meta charset="UTF-8">
   <title>Submit Your Assignments</title>
+  <link 
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" 
+    rel="stylesheet"
+  >
   <style>
+    #ListAssignments {
+      margin-top: 1rem;
+    }
+  
+    .list-item {
+      padding: 1rem;
+      margin-bottom: 1rem;
+      background-color: #ffffff;
+      border: 1px solid #dee2e6;
+      border-radius: 0.25rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+  
+    .list-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+  
+    .list-content h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #0d6efd;
+    }
+  
+    .list-content p {
+      margin: 0.25rem 0;
+      color: #495057;
+    }
     /* Reset & Base */
     * {
       margin: 0;
@@ -128,17 +162,20 @@
     <div class="card">
       <div class="card-header">Course I</div>
       <div class="card-body">
-        <p class="card-text">
-          You can currently submit your results to <strong>Assignment X</strong>. 
-          So far, we received X submissions.
+        <p class="card-text" id="HeaderText">
+          
         </p>
-        <button type="button" class="btn btn-primary" onclick="goToSSO()">
+        <p id ="ListAssignments" ></p>
+        <button type="button" class="btn btn-primary" id="submitButton">
           Submit
         </button>
+        <input type="file" id="fileInput" style="display: none;" />
         <button type="button" class="btn btn-secondary">
           Previous Submissions
         </button>
       </div>
+      <div id="fileUpload">
+      </div></div>
     </div>
   </div>
 
@@ -146,13 +183,175 @@
   <footer>
     <p> &copy; Boyue Zhou, Samer Luben Mahamid, Bella Yasir Husain Abu-Shumer, Ines ben salah, Adam Ben Rejeb</p>
   </footer>
-
+  <script 
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js">
+  </script>
   <script>
-    function goToSSO() {
-      // to be solved: SSO link is dynamic, call a server route that fetches the real link.
-	  // problem hier: Client (Browser)  ->  YourApp (Backend)  ->  Identity Provider (SSO)
-      window.location.href = "/auth/sso-init";
+    function getData(){
+      let url = "http://127.0.0.1:5984/gmci/_design/assignments/_view/assignments?include_docs=false"; //here please put in your own endpoint for the couchdb view or make one with the exact same name as me
+      let username = "admin"; //Here please put your own COUCHDB username and passwords in the variables
+      let password = "admin";
+      fetch(url,{
+          method:'GET',
+          headers: {
+               'Authorization': `Basic ${btoa(username + ':' + password)}`,
+               'Accept': 'application/json',
+               'Content-Type': 'application/json'
+          }
+      }).then(response =>response.json()).then( data =>{
+          console.log(data.rows[0].value.entries);
+          const headerText = document.getElementById("HeaderText");
+          
+          const entries = data.rows[0].value.entries;
+          headerText.innerHTML=`
+            You can currently submit your results to <strong> Assignment ${entries.length}</strong>. 
+          So far, we received 48 submissions.
+          `
+          updateList(entries);
+      })
+  }
+  document.addEventListener("DOMContentLoaded", () => {
+    getData(); 
+  });
+
+  function updateList(entries){
+    console.log("Function called");
+    const listContainer = document.getElementById("ListAssignments");
+
+    entries.forEach(entry =>{
+      const listItem = document.createElement("div");
+      listItem.className = "list-item"; 
+      listItem.innerHTML = `
+        <div class="list-content">
+          <h3>${entry.name}</h3>
+          <p><strong>Student:</strong> ${entry.student}</p>
+          <p><strong>Grade:</strong> ${entry.grade}</p>
+          <p><strong>Expired:</strong> ${entry.expired ? "Yes" : "No"}</p>
+          <p><p>
+        </div>
+      `;
+      listContainer.appendChild(listItem);
+    })
+    document.getElementById("submitButton").addEventListener("click", () => {
+    document.getElementById("fileInput").click()
+    });
+    document.getElementById("fileInput").addEventListener("change", async (event) => {
+      // Get the selected file
+      const file = event.target.files[0];
+      
+      if (file) {
+        // Upload the file to CouchDB
+        document.getElementById("fileUpload").innerHTML=`
+        <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      `
+      try{
+
+        await uploadFile(file);
+        document.getElementById("fileUpload").innerHTML=`Thank you, your file for Assignment ${entries.length} has been submitted,good luck!`;
+      }
+      catch(error){
+        console.log("aasba");
+      }
+      } else {
+        console.log("No file selected.");
+      }
+    });
+
+    async function uploadFile(file) {
+      const COUCHDB_URL = "http://127.0.0.1:5984";
+      const DATABASE = "gmci";
+      const DOCUMENT_ID = "9e9e2f34fc0e1ead9774ef79ab000f36"; // Replace with your CouchDB document ID
+      const USERNAME = "admin"; // Replace with your CouchDB username
+      const PASSWORD = "admin"; // Replace with your CouchDB password
+    
+      try {
+        
+        const response = await fetch(`${COUCHDB_URL}/${DATABASE}/${DOCUMENT_ID}`, {
+          headers: {
+            "Authorization": `Basic ${btoa(USERNAME + ":" + PASSWORD)}`
+          }
+        });
+        const document = await response.json();
+    
+        
+        const reader = new FileReader();
+        reader.onload = async function (event) {
+          const base64Data = event.target.result.split(",")[1]; 
+          const lastIndex = document.entries.length - 1;
+          const lastAssignment = document.entries[lastIndex];
+    
+          if (!lastAssignment) {
+            console.error("No assignments found in the document.");
+            return;
+          }
+    
+          if (!lastAssignment._attachments) {
+            lastAssignment._attachments = {};
+          }
+    
+          lastAssignment._attachments[file.name] = {
+            content_type: file.type,
+            data: base64Data
+          };
+    
+          
+          let retryCount = 0;
+          const maxRetries = 3;
+    
+          while (retryCount < maxRetries) {
+            try {
+              const updateResponse = await fetch(`${COUCHDB_URL}/${DATABASE}/${DOCUMENT_ID}`, {
+                method: "PUT",
+                headers: {
+                  "Content-Type": "application/json",
+                  "Authorization": `Basic ${btoa(USERNAME + ":" + PASSWORD)}`
+                },
+                body: JSON.stringify(document)
+              });
+    
+              if (updateResponse.ok) {
+                alert("File uploaded successfully!");
+                console.log("Updated document:", await updateResponse.json());
+                break; 
+              } else {
+                console.error("Failed to update document:", await updateResponse.json());
+              }
+            } catch (updateError) {
+              if (updateError.message.includes("conflict")) {
+                console.warn("Conflict detected, retrying...");
+                retryCount++;
+    
+                
+                const latestResponse = await fetch(`${COUCHDB_URL}/${DATABASE}/${DOCUMENT_ID}`, {
+                  headers: {
+                    "Authorization": `Basic ${btoa(USERNAME + ":" + PASSWORD)}`
+                  }
+                });
+                const latestDocument = await latestResponse.json();
+                document._rev = latestDocument._rev;
+              } else {
+                throw updateError; 
+              }
+            }
+          }
+    
+          if (retryCount === maxRetries) {
+            console.error("Failed to update document after multiple attempts.");
+          }
+        };
+    
+        reader.readAsDataURL(file); 
+      } catch (error) {
+        console.error("Error uploading file:", error);
+      }
     }
+    
+    
+    
+    
+  }
   </script>
 </body>
 </html>
