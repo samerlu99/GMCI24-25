@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>WELCOME TO STUIP</header>
+
+  <div class="container" id="login-container">
+    <h2>Login Page</h2>
+    <label for="userId">ID:</label>
+    <input type="text" id="userId" placeholder="Enter your ID">
+    <label for="password">Password:</label>
+    <input type="password" id="password" placeholder="Enter your Password">
+    <button onclick="login()">Press OK</button>
+    <button onclick="renewData()" style="background-color: #e74c3c;">Renew login Data</button>
+  </div>
+
+  <div class="container dashboard-section" id="dashboard">
+    <div class="links">
+      <button onclick="showSubmissions()">Submission Dashboard</button>
+      <button onclick="alert('Currently, we are working on resolving an issue. Please try again in 30 minutes.')">My Courses</button>
+      <button onclick="alert('You don’t have any meetings for this week.')">Meetings</button>
+    </div>
+    <div class="container dashboard-section" id="meetings" style="display: none;">
+      <h3>Meetings</h3>
+      <p>You don't have any meetings for this week.</p>
+    </div>
+
+    <button onclick="logout()" style="background-color: #c0392b;">Logout</button>
+  </div>
+
+  <div class="container dashboard-section" id="submissions">
+    <h3>Submission Dashboard</h3>
+    <table>
+      <tr>
+        <th>Assignment</th>
+        <th>Upload Date</th>
+        <th>Status</th>
+        <th>Download</th>
+        <th>Grade</th>
+      </tr>
+      <tr>
+        <td>Assignment 7</td>
+        <td>11.12.24</td>
+        <td>&#10003;</td>
+        <td><button>Download</button></td>
+        <td>8/10</td>
+      </tr>
+      <tr>
+        <td>Assignment 8</td>
+        <td>13.12.24</td>
+        <td>&#10003;</td>
+        <td><button>Download</button></td>
+        <td>9/10</td>
+      </tr>
+      <tr>
+        <td>Assignment 9</td>
+        <td>15.12.24</td>
+        <td>&#10003;</td>
+        <td><button onclick="downloadFile('assignment9.pdf')">Download</button></td>
+        <td id="assignment9-grade">-</td>
+        <td>
+          <button onclick="addGrade('assignment9')">Add Grade</button>
+          <button onclick="addFeedback('assignment9')">Add Feedback</button>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="container dashboard-section" id="success" style="display: none;">
+    <p class="success">All done! Your data added successfully for student: 17.12.24 - 18:06</p>
+    <button onclick="backToDashboard()">Back to Dashboard</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
